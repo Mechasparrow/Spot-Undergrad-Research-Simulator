@@ -1,0 +1,16 @@
+#VRML_SIM R2022a utf8
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.39317996516783654 0.32353171917633833 0.8606606425748895 1.9091802814844139
+  position 0.3086237158627458 -1.298335384912255 1.51764341394173
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+}
+Create {
+  translation -0.2 -0.22 0.054
+}
