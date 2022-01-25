@@ -27,11 +27,9 @@ led_names = ["left top led",          "left middle up led", "left middle down le
 print("Connecting to robot")
 robot = Robot()
 
-larmmotor = Motor("rear left elbow motor")
-larmmotor.setPosition(0.5)
-
-rarmmotor = Motor("rear right elbow motor")
-rarmmotor.setPosition(0.5)
+for motorname in ["front left elbow motor", "front right elbow motor", "rear left elbow motor", "rear right elbow motor"]:
+    larmmotor = Motor(motorname)
+    larmmotor.setPosition(1.6)
 
 while robot.step(32) != -1:
     print("Spot working")    
