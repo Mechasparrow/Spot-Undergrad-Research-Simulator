@@ -5,7 +5,7 @@ import webots_init
 
 webots_init.init_webots(webots_init.OS_ENV.WINDOWS)
 
-from controller import Robot, Motor
+from controller import Supervisor, Motor,PositionSensor
 
 class LegLocation(Enum):
     LEFT=1
@@ -16,8 +16,19 @@ class LegLocation(Enum):
     def __str__(self):
         return self.name.lower()
 
+class MotorType(Enum):
+    ELBOW=1
+    SHOULDER=2
+    ABDUCTION=3
 
-
+    def __str__(self):
+        if (self == MotorType.SHOULDER):
+            return "shoulder rotation"
+        elif (self == MotorType.ABDUCTION):
+            return "shoulder abduction"
+        else:
+            return self.name.lower()
+   
 def sit_task_init(spot_robot):
      spot_robot.task_data["goal_shoulder_motor"] = -0.99
      spot_robot.task_data["goal_elbow_motor"] = 1.59
@@ -52,13 +63,21 @@ def stand_task_act(spot_robot):
     sit_task_act(spot_robot)
 
 class SpotSimRobot():
-    def __init__(self, webots_robot: Robot):
+    def __init__(self, webots_robot: Supervisor):
         self.robot = webots_robot
         self.time_step = self.robot.getBasicTimeStep()
 
         self.tasks = []
         self.task_data = None        
         self.running_task = None
+
+    def getMotorPosition(self, x_side: LegLocation, y_side: LegLocation, motor_type:MotorType):
+        sensor = PositionSensor(f'{y_side} {x_side} {motor_type} sensor') 
+        return sensor
+
+    def getMotor(self, x_side: LegLocation, y_side: LegLocation, motor_type: MotorType):
+        motor = Motor(f'{y_side} {x_side} {motor_type} motor')
+        return motor
 
     def getElbowMotor(self,x_side: LegLocation, y_side: LegLocation) -> Motor:
         return Motor(f'{y_side} {x_side} elbow motor')

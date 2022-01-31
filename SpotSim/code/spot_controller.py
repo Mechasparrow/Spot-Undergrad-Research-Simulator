@@ -1,9 +1,10 @@
+from spot_model import MotorType
 from spot_model import LegLocation, SpotSimRobot
 import webots_init
 
 webots_init.init_webots(webots_init.OS_ENV.WINDOWS)
 
-from controller import Robot, Motor
+from controller import Supervisor, Robot, Motor
 
 print("Connecting to Spot robot")
 
