@@ -16,11 +16,7 @@ class LegLocation(Enum):
     def __str__(self):
         return self.name.lower()
 
-def stand_task_init(spot_robot):
-    pass 
 
-def stand_task_act(spot_robot):
-    pass
 
 def sit_task_init(spot_robot):
      spot_robot.task_data["goal_shoulder_motor"] = -0.99
@@ -42,6 +38,18 @@ def sit_task_act(spot_robot):
 
             shoulder_motor.setPosition(current_shoulder_motor_position + spot_robot.task_data["delta_shoulder"])
             elbow_motor.setPosition(current_elbow_motor_position + spot_robot.task_data["delta_elbow"])
+
+def stand_task_init(spot_robot):
+    spot_robot.task_data["goal_shoulder_motor"] = 0
+    spot_robot.task_data["goal_elbow_motor"] = 0
+    spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
+    spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
+
+    spot_robot.task_data["delta_elbow"] = (spot_robot.task_data["goal_elbow_motor"] - spot_robot.task_data["current_elbow_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
+    spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
+
+def stand_task_act(spot_robot):
+    sit_task_act(spot_robot)
 
 class SpotSimRobot():
     def __init__(self, webots_robot: Robot):
@@ -79,18 +87,23 @@ class SpotSimRobot():
 
             if (task == "SIT"):
                 sit_task_init(self)
+            elif(task == "STAND"):
+                stand_task_init(self)
+                print(self.task_data)
 
         self.task_data["step_counter"] += 1
 
         if (self.task_data["task"] == "SIT"):
             sit_task_act(self)
+        elif(self.task_data["task"] == "STAND"):
+            stand_task_act(self)
 
         if (self.task_data["step_counter"] > self.task_data["steps_to_complete_move"]):
             print("Task complete")
             self.cleanupTask()
 
     def cleanupTask(self):
-        self.task_data = {}
+        self.task_data = None
         self.running_task = None
 
     def selectTask(self):
