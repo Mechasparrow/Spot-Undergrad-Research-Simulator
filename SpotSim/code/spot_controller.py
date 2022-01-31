@@ -17,20 +17,6 @@ while robot.step(int(spot_bot.time_step)) != -1:
     spot_bot.selectTask()
   else:
     spot_bot.runSelectedTask()
-  
-  #if (step_counter < steps_for_move):
-   # for x in [LegLocation.LEFT,LegLocation.RIGHT]:
-    #  for y in [LegLocation.FRONT,LegLocation.REAR]:
-     #   elbow_motor = spot_bot.getElbowMotor(x, y)
-      #  shoulder_motor = spot_bot.getShoulderRotationMotor(x, y)  
-
-       # current_shoulder_motor_position = shoulder_motor.getTargetPosition()
-       # current_elbow_motor_position = elbow_motor.getTargetPosition()
-
-       # shoulder_motor.setPosition(current_shoulder_motor_position + delta_shoulder)
-       # elbow_motor.setPosition(current_elbow_motor_position + delta_elbow)
-
-    # step_counter+=1
 
       
   

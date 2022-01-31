@@ -16,6 +16,12 @@ class LegLocation(Enum):
     def __str__(self):
         return self.name.lower()
 
+def stand_task_init(spot_robot):
+    pass 
+
+def stand_task_act(spot_robot):
+    pass
+
 def sit_task_init(spot_robot):
      spot_robot.task_data["goal_shoulder_motor"] = -0.99
      spot_robot.task_data["goal_elbow_motor"] = 1.59
