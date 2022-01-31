@@ -199,7 +199,7 @@
     <child link="front left shoulder"/>
     <axis xyz="0 0 1"/>
     <limit effort="50" lower="-0.6" upper="0.5" velocity="10"/>
-    <origin xyz="0.1935 -1.326719 0.628594" rpy="1.5708 -0.00001 -1.570793"/>
+    <origin xyz="0.365 0.0528 0.012301" rpy="1.5708 -0.00001 -1.570793"/>
   </joint>
   <link name="front left shoulder">
     <visual>
