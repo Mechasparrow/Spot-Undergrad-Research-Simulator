@@ -70,7 +70,7 @@ class SpotSimRobot():
         return Motor(f'{y_side} {x_side} shoulder abduction motor')
 
     def scheduleTask(self, task:str, task_duration: Double):
-        self.tasks += [(task, task_duration)]
+        self.tasks = [(task, task_duration)] + self.tasks
 
     def runSelectedTask(self):
         # First time running task
@@ -87,6 +87,8 @@ class SpotSimRobot():
 
             if (task == "SIT"):
                 sit_task_init(self)
+            elif (self.task_data["task"] == "SLEEP"):
+                pass
             elif(task == "STAND"):
                 stand_task_init(self)
                 print(self.task_data)
@@ -95,6 +97,8 @@ class SpotSimRobot():
 
         if (self.task_data["task"] == "SIT"):
             sit_task_act(self)
+        elif (self.task_data["task"] == "SLEEP"):
+            pass
         elif(self.task_data["task"] == "STAND"):
             stand_task_act(self)
 

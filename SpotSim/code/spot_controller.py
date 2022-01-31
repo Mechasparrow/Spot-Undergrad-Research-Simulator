@@ -10,8 +10,9 @@ print("Connecting to Spot robot")
 robot = Robot()
 spot_bot = SpotSimRobot(robot)
 
-spot_bot.scheduleTask("STAND", 3)
 spot_bot.scheduleTask("SIT", 2)
+spot_bot.scheduleTask("SLEEP", 2)
+spot_bot.scheduleTask("STAND", 3)
 
 while robot.step(int(spot_bot.time_step)) != -1:
   if (not spot_bot.taskSelected()):
