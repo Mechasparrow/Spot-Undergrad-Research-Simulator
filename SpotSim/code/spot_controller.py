@@ -1,15 +1,8 @@
-import os 
-import sys 
+import webots_init
 
-#environ init for Webots Windows
-os.environ["WEBOTS_HOME"] = r"C:\Program Files\Webots"
-sys.path.append(os.environ["WEBOTS_HOME"] + r'\lib\controller')
-sys.path.append(os.environ["WEBOTS_HOME"] + r'\msys64\mingw64\bin')
-sys.path.append(os.environ["WEBOTS_HOME"] + r'\msys64\mingw64\bin\cpp')
-sys.path.append(os.environ["WEBOTS_HOME"] + r"/lib/controller/python39")
+webots_init.init_webots(webots_init.OS_ENV.WINDOWS)
 
 from controller import Robot, Motor
-
 import time
 import math
 
