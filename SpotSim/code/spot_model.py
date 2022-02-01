@@ -29,6 +29,8 @@ class MotorType(Enum):
         else:
             return self.name.lower()
    
+
+
 def sit_task_init(spot_robot):
      spot_robot.task_data["goal_shoulder_motor"] = -0.99
      spot_robot.task_data["goal_elbow_motor"] = 1.59
@@ -51,8 +53,8 @@ def sit_task_act(spot_robot):
             elbow_motor.setPosition(current_elbow_motor_position + spot_robot.task_data["delta_elbow"])
 
 def stand_task_init(spot_robot):
-    spot_robot.task_data["goal_shoulder_motor"] = 0.2
-    spot_robot.task_data["goal_elbow_motor"] = 0.4
+    spot_robot.task_data["goal_shoulder_motor"] = 0
+    spot_robot.task_data["goal_elbow_motor"] = 0
     spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
     spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
 
@@ -60,6 +62,20 @@ def stand_task_init(spot_robot):
     spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
 
 def stand_task_act(spot_robot):
+    sit_task_act(spot_robot)
+
+def pos_task_init(spot_robot, extra_data):
+    elbow_motor_pos, shoulder_motor_pos = extra_data
+    spot_robot.task_data["goal_shoulder_motor"] = shoulder_motor_pos
+    spot_robot.task_data["goal_elbow_motor"] = elbow_motor_pos
+    spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
+    spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
+
+    spot_robot.task_data["delta_elbow"] = (spot_robot.task_data["goal_elbow_motor"] - spot_robot.task_data["current_elbow_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
+    spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
+
+
+def pos_task_act(spot_robot):
     sit_task_act(spot_robot)
 
 class SpotSimRobot():
@@ -88,13 +104,13 @@ class SpotSimRobot():
     def getShoulderAbductionMotor(self,x_side: LegLocation, y_side: LegLocation) -> Motor:
         return Motor(f'{y_side} {x_side} shoulder abduction motor')
 
-    def scheduleTask(self, task:str, task_duration: Double):
-        self.tasks = [(task, task_duration)] + self.tasks
+    def scheduleTask(self, task:str, task_duration: Double, extra_data = None):
+        self.tasks = [(task, task_duration, extra_data)] + self.tasks
 
     def runSelectedTask(self):
         # First time running task
         if (self.task_data == None):
-            task, duration = self.running_task
+            task, duration, extra_data = self.running_task
             self.task_data = {
                 "task": task,
                 "duration": duration,
@@ -106,6 +122,8 @@ class SpotSimRobot():
 
             if (task == "SIT"):
                 sit_task_init(self)
+            elif (task == "POS"):
+                pos_task_init(self, extra_data)
             elif (self.task_data["task"] == "SLEEP"):
                 pass
             elif(task == "STAND"):
@@ -116,8 +134,8 @@ class SpotSimRobot():
 
         if (self.task_data["task"] == "SIT"):
             sit_task_act(self)
-        elif (self.task_data["task"] == "SLEEP"):
-            pass
+        elif (self.task_data["task"] == "POS"):
+            pos_task_act(self)
         elif(self.task_data["task"] == "STAND"):
             stand_task_act(self)
 
