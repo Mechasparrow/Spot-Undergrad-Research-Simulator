@@ -56,6 +56,10 @@ for link in armChain.links:
         position_sensor.enable(timeStep)
         motors.append(motor)
 
+#wheel offset
+# Shoulder: -0.6
+# Elbow: -1.6
+
 # Get the arm and target nodes.
 target = supervisor.getFromDef('TARGET')
 arm = supervisor.getSelf()

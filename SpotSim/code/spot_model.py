@@ -51,8 +51,8 @@ def sit_task_act(spot_robot):
             elbow_motor.setPosition(current_elbow_motor_position + spot_robot.task_data["delta_elbow"])
 
 def stand_task_init(spot_robot):
-    spot_robot.task_data["goal_shoulder_motor"] = 0
-    spot_robot.task_data["goal_elbow_motor"] = 0
+    spot_robot.task_data["goal_shoulder_motor"] = 0.2
+    spot_robot.task_data["goal_elbow_motor"] = 0.4
     spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
     spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
 

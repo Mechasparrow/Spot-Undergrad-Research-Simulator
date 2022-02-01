@@ -21,6 +21,8 @@ spot_bot = SpotSimRobot(robot)
 #rightRearChain = Chain.from_urdf_file("../URDF/spot-rear-right.urdf")
 leftRearChain = Chain.from_urdf_file("../URDF/spot-rear-left.urdf")
 
+leftRearChain.active_links_mask[0] = False
+
 #print("Right Rear Leg Chain")
 #print(rightRearChain)
 
@@ -43,32 +45,23 @@ for orientation in [LegLocation.LEFT]:
 
 robot.step(int(spot_bot.time_step))
 
-initial_position = [0] + [m.getValue() for m in motor_positions] + [0]
-ik_results = leftRearChain.inverse_kinematics([-0.5,0,0])
+initial_position = [0] + [m.getValue() for m in motor_positions]
 
+
+#wheel offset
+# Shoulder: -0.6
+# Elbow: -1.6
+
+ik_results = leftRearChain.inverse_kinematics([-0.32,0,0], initial_position = initial_position)
+offsets = [0, 0.5,0.6, 1.6]
+
+print(ik_results)
 for i in range(3):
-  controlling_motors[i].setPosition(ik_results[i])
-
-#spot_bot.scheduleTask("SIT", 2)
-#spot_bot.scheduleTask("STAND", 1)
-#spot_bot.scheduleTask("SIT", 2)
-#spot_bot.scheduleTask("STAND", 1)
-#spot_bot.scheduleTask("SIT", 0.5)
-
-#motor_position = spot_bot.getMotorPosition(LegLocation.LEFT, LegLocation.REAR, MotorType.ELBOW)
-#motor_position.enable(int(spot_bot.time_step))
-
-#robot.step(int(spot_bot.time_step))
-
-#print(f"Motor Position of Left Rear: {motor_position.getValue()}")
+  print(controlling_motors[i].getName())
+  controlling_motors[i].setPosition(ik_results[i+1] - offsets[i+1])
 
 while robot.step(int(spot_bot.time_step)) != -1:
-  #if (not spot_bot.taskSelected()):
-   # print("No task selected. Pulling task from task queue")
-    #print(f"Motor Position of Left Rear: {motor_position.getValue()}")
-    #spot_bot.selectTask()
-  #else:
-   # spot_bot.runSelectedTask()
+
   pass
 
       
