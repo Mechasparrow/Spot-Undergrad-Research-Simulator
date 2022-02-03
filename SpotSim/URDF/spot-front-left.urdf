@@ -653,11 +653,5 @@
       </geometry>
     </collision>
   </link>
-  <joint name="front left piston motor" type="continuous">
-    <parent link="front left upperarm"/>
-    <child link="solid_2"/>
-    <axis xyz="1 0 0"/>
-    <limit effort="10" velocity="10"/>
-    <origin xyz="-0.1172 -0.29077 0.2083" rpy="-0.5236 0 0"/>
-  </joint> 
+ 
 </robot>

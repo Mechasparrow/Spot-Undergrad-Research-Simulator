@@ -21,8 +21,19 @@ x = 0.4
 
 leg_masks = [ (False, False, False, True), (True, False, False, False), (False, True, False, False), (False, False, True, False)]
 
-for leg_mask in leg_masks:
-  spot_bot.scheduleTask("POS", 0.2, leg_mask, (0.0,0.39))
+spot_bot.scheduleTask("POS", 0.5, (True, True, True, True), (-0.541052,0.9320058))
+
+
+
+for i in range(10):
+  for leg_mask in leg_masks:
+    spot_bot.scheduleTask("POS", 0.05, leg_mask, (-0.541052,1.0088))
+    spot_bot.scheduleTask("POS", 0.05, leg_mask, (-0.1937315,1.0088))
+    spot_bot.scheduleTask("POS", 0.05, leg_mask, (-0.1937315,0.855211))
+
+  spot_bot.scheduleTask("POS", 0.3, (True, True, True, True), (-0.541052,0.9320058))
+
+spot_bot.scheduleTask("STAND", 0.5)  
 
 
 while robot.step(int(spot_bot.time_step)) != -1:
