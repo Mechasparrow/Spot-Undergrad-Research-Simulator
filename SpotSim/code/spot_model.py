@@ -29,54 +29,29 @@ class MotorType(Enum):
         else:
             return self.name.lower()
    
-
-
-def sit_task_init(spot_robot):
-     spot_robot.task_data["goal_shoulder_motor"] = -0.99
-     spot_robot.task_data["goal_elbow_motor"] = 1.59
-     spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
-     spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
-
-     spot_robot.task_data["delta_elbow"] = (spot_robot.task_data["goal_elbow_motor"] - spot_robot.task_data["current_elbow_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
-     spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
-
-def sit_task_act(spot_robot):
-    for x in [LegLocation.LEFT,LegLocation.RIGHT]:
-        for y in [LegLocation.FRONT,LegLocation.REAR]:
-            elbow_motor = spot_robot.getElbowMotor(x, y)
-            shoulder_motor = spot_robot.getShoulderRotationMotor(x, y)  
-
-            current_shoulder_motor_position = shoulder_motor.getTargetPosition()
-            current_elbow_motor_position = elbow_motor.getTargetPosition()
-
-            shoulder_motor.setPosition(current_shoulder_motor_position + spot_robot.task_data["delta_shoulder"])
-            elbow_motor.setPosition(current_elbow_motor_position + spot_robot.task_data["delta_elbow"])
-
-def stand_task_init(spot_robot):
-    spot_robot.task_data["goal_shoulder_motor"] = 0
-    spot_robot.task_data["goal_elbow_motor"] = 0
-    spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
-    spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
-
-    spot_robot.task_data["delta_elbow"] = (spot_robot.task_data["goal_elbow_motor"] - spot_robot.task_data["current_elbow_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
-    spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
-
-def stand_task_act(spot_robot):
-    sit_task_act(spot_robot)
-
 def pos_task_init(spot_robot, extra_data):
-    elbow_motor_pos, shoulder_motor_pos = extra_data
-    spot_robot.task_data["goal_shoulder_motor"] = shoulder_motor_pos
-    spot_robot.task_data["goal_elbow_motor"] = elbow_motor_pos
-    spot_robot.task_data["current_shoulder_pos"] = spot_robot.getShoulderRotationMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
-    spot_robot.task_data["current_elbow_pos"] = spot_robot.getElbowMotor(LegLocation.LEFT,LegLocation.REAR).getTargetPosition()
+    shoulder_motor_goal_pos, elbow_motor_goal_pos = extra_data
+
+    spot_robot.task_data["goal_shoulder_motor"] = shoulder_motor_goal_pos
+    spot_robot.task_data["goal_elbow_motor"] = elbow_motor_goal_pos
+    spot_robot.task_data["current_shoulder_pos"] = spot_robot.getMotor(LegLocation.LEFT,LegLocation.REAR, MotorType.SHOULDER).getTargetPosition()
+    spot_robot.task_data["current_elbow_pos"] = spot_robot.getMotor(LegLocation.LEFT,LegLocation.REAR, MotorType.ELBOW).getTargetPosition()
 
     spot_robot.task_data["delta_elbow"] = (spot_robot.task_data["goal_elbow_motor"] - spot_robot.task_data["current_elbow_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
     spot_robot.task_data["delta_shoulder"] = (spot_robot.task_data["goal_shoulder_motor"] - spot_robot.task_data["current_shoulder_pos"]) / (spot_robot.task_data["steps_to_complete_move"])
 
 
 def pos_task_act(spot_robot):
-    sit_task_act(spot_robot)
+    for x in [LegLocation.LEFT,LegLocation.RIGHT]:
+        for y in [LegLocation.FRONT,LegLocation.REAR]:
+            elbow_motor = spot_robot.getMotor(x, y, MotorType.ELBOW)
+            shoulder_motor = spot_robot.getMotor(x, y, MotorType.SHOULDER)  
+
+            current_shoulder_motor_position = shoulder_motor.getTargetPosition()
+            current_elbow_motor_position = elbow_motor.getTargetPosition()
+
+            shoulder_motor.setPosition(current_shoulder_motor_position + spot_robot.task_data["delta_shoulder"])
+            elbow_motor.setPosition(current_elbow_motor_position + spot_robot.task_data["delta_elbow"])
 
 class SpotSimRobot():
     def __init__(self, webots_robot: Supervisor):
@@ -95,15 +70,6 @@ class SpotSimRobot():
         motor = Motor(f'{y_side} {x_side} {motor_type} motor')
         return motor
 
-    def getElbowMotor(self,x_side: LegLocation, y_side: LegLocation) -> Motor:
-        return Motor(f'{y_side} {x_side} elbow motor')
-
-    def getShoulderRotationMotor(self,x_side: LegLocation, y_side: LegLocation) -> Motor:
-        return Motor(f'{y_side} {x_side} shoulder rotation motor')
-
-    def getShoulderAbductionMotor(self,x_side: LegLocation, y_side: LegLocation) -> Motor:
-        return Motor(f'{y_side} {x_side} shoulder abduction motor')
-
     def scheduleTask(self, task:str, task_duration: Double, extra_data = None):
         self.tasks = [(task, task_duration, extra_data)] + self.tasks
 
@@ -121,24 +87,18 @@ class SpotSimRobot():
             print("Task initialized")
 
             if (task == "SIT"):
-                sit_task_init(self)
+                pos_task_init(self, (-0.99, 1.59))
             elif (task == "POS"):
                 pos_task_init(self, extra_data)
-            elif (self.task_data["task"] == "SLEEP"):
-                pass
             elif(task == "STAND"):
-                stand_task_init(self)
+                pos_task_init(self, (0,0))
                 print(self.task_data)
 
         self.task_data["step_counter"] += 1
 
-        if (self.task_data["task"] == "SIT"):
-            sit_task_act(self)
-        elif (self.task_data["task"] == "POS"):
+        if (self.task_data["task"] == "SIT" or self.task_data["task"] == "POS" or self.task_data["task"] == "STAND"):
             pos_task_act(self)
-        elif(self.task_data["task"] == "STAND"):
-            stand_task_act(self)
-
+       
         if (self.task_data["step_counter"] > self.task_data["steps_to_complete_move"]):
             print("Task complete")
             self.cleanupTask()
