@@ -12,23 +12,26 @@ public class SpotController : MonoBehaviour
         public GameObject robotPart;
     }
     public Joint[] joints;
-
+    
     private ArticulationJointController[] controllers;
+
+    //TODO use observer pattern
+    public delegate void ControllerInitialized();
+
+    public ControllerInitialized controllerInitialized;
 
     void Start()
     {
         // Get all joints
         controllers = new ArticulationJointController[joints.Length];
+
         for (int i = 0; i < joints.Length; i++)
         {
             controllers[i] = joints[i].robotPart.GetComponent<ArticulationJointController>();
         }
 
-        UpdateRotation(1, SpotState.Go, -10.0f);
-        UpdateRotation(2, SpotState.Go, -40.0f);
-        
-        
-        
+        controllerInitialized?.Invoke();
+
     }
 
     // Stop the joints if necessary
@@ -46,8 +49,4 @@ public class SpotController : MonoBehaviour
         controllers[jointIndex].rotationGoal = jointPosition;
         controllers[jointIndex].robotState = state;
     }
-
-
-
-
 }
